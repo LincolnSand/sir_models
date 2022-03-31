@@ -10,7 +10,7 @@ epi203 <- function(pars) {
 
     ## Additional parameters
     times <- seq(from = 0, to = 600, by = 1)              # we want to run the model for 3000 time steps
-    yinit <- c(Susc = 0.7, Infected1 = 0.1, Infected2 = 0.2, Recovered = 0) # this parameter sets the initial conditions
+    yinit <- c(Susc = 0.8, Infected1 = 0.1, Infected2 = 0.1, Recovered = 0) # this parameter sets the initial conditions
 
     ## below is the code for the actual model including the equations that you should recognize
     SIR_model <- function(times, yinit, pars){
@@ -36,8 +36,34 @@ epi203 <- function(pars) {
 
 ##############################################################################
 
-test.pars <- c(beta1 = 0.3, recovery1 = 0.1, virus_death1 = 0.002, beta2 = 0.2, recovery2 = 0.1, virus_death2 = 0.005, loss_of_immunity = 0.3, natural_death = 0.001, birth = 0.001)
+death_rate_c = 0.01
+
+# Define the parameters for days infected as a function of virulence
+n = 6
+w = 8
+c = 0.005
+r = 200000
+
+
+
+R0_1 = 3.0
+virus_death1 = death_rate_c/R0_1
+# https://www.desmos.com/calculator/ymr7o1cmye
+days_infected1 = exp(-r*(virus_death1-c)*(virus_death1-c))*w + n
+recover_rate1 = 1/days_infected1
+beta1 = R0_1*recover_rate1
+
+R0_2 = 2.1
+virus_death2 = death_rate_c/R0_2
+days_infected2 = exp(-r*(virus_death2-c)*(virus_death2-c))*w + n
+recover_rate2 = 1/days_infected2
+beta2 = R0_2*recover_rate2
+
+test.pars <- c(beta1 = beta1, recovery1 = recover_rate1, virus_death1 = virus_death1, beta2 = beta2, recovery2 = recover_rate2, virus_death2 = virus_death2, loss_of_immunity = 0.3, natural_death = 0.001, birth = 0.001)
 results   <- epi203(test.pars)
+
+print(days_infected1)
+print(days_infected2)
 
 ##############################################################################
 ## Plotting
